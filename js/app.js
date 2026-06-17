@@ -108,13 +108,51 @@ function renderExactSheet(tab,out){
   }
   html+='</div></div></section>'; return html;
 }
+
+function renderPlanSheet(tab,out){
+  const spec=PBT_LAYOUT_SPECS.sheets[tab], st=PBT.state[tab];
+  const range=tab==='cafe'?{start:18,end:27}:{start:17,end:27};
+  return renderSheetRange(tab,out,range.start,range.end,`Plan de distribución recomendado — ${st.tipo}`,'plan-card','plan-grid');
+}
+function renderSheetRange(tab,out,startRow,endRow,title,cardClass,gridClass){
+  const spec=PBT_LAYOUT_SPECS.sheets[tab], baseForm=(PBT_LAYOUT_SPECS.baseFormulas&&PBT_LAYOUT_SPECS.baseFormulas[tab])||{}, st=PBT.state[tab];
+  const dyn=cellAddressModel(tab,out); const cellMap=new Map(); const covered=new Set(spec.covered||[]);
+  for(const c of spec.cells||[]) cellMap.set(`${c.r}:${c.c}`, {...c});
+  for(const [a,d] of Object.entries(dyn)){ const m=a.match(/^([A-Z]+)(\d+)$/); if(!m) continue; let col=0; for(const ch of m[1]) col=col*26+ch.charCodeAt(0)-64; const row=Number(m[2]); const key=`${row}:${col}`; const cell=cellMap.get(key)||{r:row,c:col,a}; cell.v=d.v; if(d.formula) cell.f=d.formula; if(d.editable) cell.editable=1; cell.dynamic=1; cellMap.set(key,cell); }
+  const rows=routineRows(out.F16), rmap=routineMap(rows); let coords=coordsFor(tab,out.F16);
+  if(tab==='dt' && st.partnerTablet==='Sí') coords=coords.map(c=>String(c.partner).replace('.','').trim()==='B'?{...c,row:0,col:9,tablet:true}:c);
+  for(const c of coords){
+    const keyLetter=String(c.partner).replace('.','').trim(); const r=(c.tablet?17:c.row+17), col=(c.tablet?10:c.col+1);
+    if(r<1||col<1||r>spec.maxRows||col>spec.maxCols) continue;
+    const k=`${r}:${col}`, rr=rmap[keyLetter]||{}, fixed=isYes(rr.planted), cell=cellMap.get(k)||{r,c:col,a:addr(r,col)};
+    cell.v=c.partner; cell.partner=keyLetter; cell.partnerName=nameFor(tab,keyLetter); cell.planted=fixed; cell.station=rr.station||''; cell.routines=rr.routines||''; cell.sclass=fixed?stationColor(rr.station):''; cellMap.set(k,cell);
+  }
+  const rowHeights=spec.heights.slice(startRow-1,endRow).map(h=>Math.max(14,Math.round(h)));
+  const colTpl=spec.widths.map(w=>`${Math.max(24,Math.round(w))}px`).join(' ');
+  const rowTpl=rowHeights.map(h=>`${h}px`).join(' ');
+  let html=`<section class="exact-card ${cardClass}"><div class="sheet-title">${esc(title)}</div><div class="exact-scroll plan-scroll"><div class="exact-grid ${gridClass} ${tab}-sheet" style="grid-template-columns:${colTpl};grid-template-rows:${rowTpl}">`;
+  for(let r=startRow;r<=endRow;r++){
+    for(let c=1;c<=spec.maxCols;c++){
+      if(covered.has(`${r}:${c}`)) continue;
+      const cell=cellMap.get(`${r}:${c}`)||{r,c,a:addr(r,c)}; const a=cell.a||addr(r,c); const rs=Math.min(cell.rs||1,endRow-r+1), cs=cell.cs||1; if(rs<=0) continue;
+      let inner=esc(cell.v??''); const formula=cell.f || baseForm[a] || ''; const classes=['xcell']; if(cell.s) classes.push(cell.s); if(formula) classes.push('formula'); if(cell.editable) classes.push('editable');
+      if(cell.partner){ classes.push(cell.planted?'pbt-fixed-cell':'pbt-flex-cell'); if(cell.planted&&cell.sclass) classes.push(cell.sclass); inner=`<strong>${esc(cell.v)}</strong>${cell.partnerName?`<small>${esc(cell.partnerName)}</small>`:''}`; }
+      const gr=(r-startRow+1);
+      html+=`<div class="${classes.join(' ')}" data-addr="${a}" title="${esc(a+(formula?' | '+formula:''))}" style="grid-row:${gr}/span ${rs};grid-column:${c}/span ${cs}">${inner}</div>`;
+    }
+  }
+  html+='</div></div></section>'; return html;
+}
+function renderAdminMotor(tab,out){
+  return `<details class="admin-motor"><summary>⚙ Mostrar Motor de Celdas PBT24</summary>${renderExactSheet(tab,out)}</details>`;
+}
 function renderMetrics(tab,out){ const ch=out.calc.canales,mx=out.calc.mix,st=PBT.state[tab]; const channels=tab==='cafe'?['Lobby','Pick up & Delivery']:['Lobby','Pick up & Delivery','DT']; const channelTotal=channels.reduce((a,k)=>a+(ch[k]||0),0), mixTotal=['Espresso','Café filtrado','CBS','Food','Otro'].reduce((a,k)=>a+(mx[k]||0),0); return `<div class="metrics"><div class="box"><h3>Información de turno</h3><div class="big">${st.partners}</div><small>Partners</small></div><div class="box"><h3>Distribución de canales</h3><div class="metric-row">${channels.map(k=>`<div><b>${PBT.labels.channel[k]}</b><span>${pct(ch[k])}</span></div>`).join('')}</div><strong class="${channelTotal===100?'ok':'bad'}">Total: ${channelTotal}%</strong></div><div class="box"><h3>Mix de productos</h3><div class="metric-row">${['Espresso','Café filtrado','CBS','Food','Otro'].map(k=>`<div><b>${PBT.labels.mix[k]}</b><span>${pct(mx[k])}</span></div>`).join('')}</div><strong class="${mixTotal===100?'ok':'bad'}">Total: ${mixTotal}%</strong></div></div>`; }
 function renderRoutines(tab,out){ const play=out.F16, rows=routineRows(play); let html=`<section class="routine-card"><div class="section-title">Rutinas de Partners</div><table class="routine"><thead><tr><th>Partner</th><th>Nombre dinámico</th><th>Estación</th><th>Fijo</th><th>Rutinas</th></tr></thead><tbody>`; for(const r of rows){ const key=String(r.partner).replace('.','').trim(), fixed=isYes(r.planted), val=nameFor(tab,key), tablet=tab==='dt'&&PBT.state.dt.partnerTablet==='Sí'&&key==='B'; html+=`<tr class="${fixed?'row-fixed':'row-flex'}"><td><b>${esc(r.partner)}</b></td><td><input class="name-input" value="${esc(val)}" maxlength="8" oninput="setName('${tab}','${esc(key)}',this.value)"></td><td>${esc(tablet?r.station+' + Carril':r.station)}</td><td>${esc(r.planted)}</td><td>${esc(tablet?r.routines+' + Tablet':r.routines)}</td></tr>`; } return html+'</tbody></table></section>'; }
 function setName(tab,key,value){ PBT.state[tab].names[key]=cleanName(value); localStorage.setItem(`pbt_exact_names_${tab}`,JSON.stringify(PBT.state[tab].names)); renderTab(tab,false); }
 window.setName=setName;
 function restoreNames(){ ['cafe','dt'].forEach(tab=>{ try{PBT.state[tab].names=JSON.parse(localStorage.getItem(`pbt_exact_names_${tab}`)||'{}');}catch(e){PBT.state[tab].names={};} }); }
 function bindFilters(tab){ ['Mes','Weekpart','DayPart','Tienda'].forEach(k=>{const el=document.getElementById(`${tab}_${k}`); if(el) el.onchange=()=>renderTab(tab);}); const p=document.getElementById(`${tab}_partners`); if(p) p.onchange=()=>renderTab(tab); const t=document.getElementById('dt_tablet'); if(t) t.onchange=()=>renderTab(tab); }
-function renderTab(tab,read=true){ if(read) readFilters(tab); const out=compute(tab), st=PBT.state[tab], root=document.getElementById(tab); const visibleStore=st.filters.Tienda[0]||'Todas las tiendas'; root.innerHTML=buildFilters(tab)+`<div class="print-head"><div><b>Tienda:</b> ${esc(visibleStore)}</div><div><b>WeekPart / DayPart:</b> ${esc(st.filters.Weekpart.join(', ')||'Todos')} / ${esc(st.filters.DayPart.join(', ')||'Todos')}</div><div><b>Partners:</b> ${st.partners}</div></div>`+renderExactSheet(tab,out)+renderMetrics(tab,out)+renderRoutines(tab,out); document.getElementById(`${tab}_status`).textContent=`Registros: ${out.calc.registros.toLocaleString('es-MX')} | Tiendas visibles: ${out.calc.tiendasVisibles} | D5: ${out.D5} | F16: ${out.F16}`; bindFilters(tab); }
+function renderTab(tab,read=true){ if(read) readFilters(tab); const out=compute(tab), st=PBT.state[tab], root=document.getElementById(tab); const visibleStore=st.filters.Tienda[0]||'Todas las tiendas'; root.innerHTML=buildFilters(tab)+`<div class="print-head"><div><b>Tienda:</b> ${esc(visibleStore)}</div><div><b>WeekPart / DayPart:</b> ${esc(st.filters.Weekpart.join(', ')||'Todos')} / ${esc(st.filters.DayPart.join(', ')||'Todos')}</div><div><b>Partners:</b> ${st.partners}</div></div>`+renderPlanSheet(tab,out)+renderMetrics(tab,out)+renderRoutines(tab,out)+renderAdminMotor(tab,out); document.getElementById(`${tab}_status`).textContent=`Registros: ${out.calc.registros.toLocaleString('es-MX')} | Tiendas visibles: ${out.calc.tiendasVisibles} | D5: ${out.D5} | F16: ${out.F16}`; bindFilters(tab); }
 function showTab(tab){ PBT.active=tab; $$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); $$('.page').forEach(p=>p.classList.toggle('active',p.id===tab)); renderTab(tab,false); }
 window.showTab=showTab;
 function exportPDF(tab){ readFilters(tab); const st=PBT.state[tab]; const tienda=(st.filters.Tienda[0]||'Todas').replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_-]+/g,'_'); const wp=(st.filters.Weekpart[0]||'Todos').replace(/\W+/g,'_'); const dp=(st.filters.DayPart[0]||'Todos').replace(/\W+/g,'_'); document.title=`PBT_${tienda}_${wp}_${dp}_${st.partners}Partners`; window.print(); }
