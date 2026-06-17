@@ -198,8 +198,8 @@ function exportPDF(tab){
 }
 window.exportPDF=exportPDF;
 function boot(){
-  const ok=window.PBT_ENGINE && window.EXCEL_DATA;
-  if(!ok){ document.body.innerHTML='<main class="fatal"><h1>PBT Motor Exacto</h1><p>No cargaron los archivos de datos. Valida js/data_part_01..04.js, js/data_loader.js y js/excel_data.js.</p></main>'; return; }
+  const ok=window.PBT_ENGINE && (typeof EXCEL_DATA !== 'undefined');
+  if(!ok){ const missing=[]; if(!window.PBT_ENGINE) missing.push('PBT_ENGINE/data_loader'); if(typeof EXCEL_DATA==='undefined') missing.push('EXCEL_DATA/excel_data'); document.body.innerHTML='<main class="fatal"><h1>PBT Motor Exacto</h1><p>No cargaron los archivos de datos: '+missing.join(', ')+'. Valida js/data_part_01..04.js, js/data_loader.js y js/excel_data.js.</p></main>'; return; }
   restoreNames();
   document.getElementById('cafe').innerHTML=buildFilters('cafe');
   document.getElementById('dt').innerHTML=buildFilters('dt');
