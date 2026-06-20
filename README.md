@@ -27,3 +27,11 @@ Subir por partes si GitHub Web marca límite:
    - `data_part_04.js`
 
 No subir `data.js`.
+
+
+## Fase 7
+- KPI arriba del layout.
+- Vista Operativa / Ejecutiva.
+- Rutinas colapsables.
+- PDF vertical A4 con colores preservados.
+- Layout centrado con mayor margen visual.
