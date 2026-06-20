@@ -105,3 +105,59 @@
   body.printing-pdf .routine-card{display:block!important;}
   body.printing-pdf .routine-body{display:block!important;}
 }
+
+
+/* Phase 8: limpio, una sola pagina PDF y mayor aire visual */
+body{background:#f5f7f5;}
+.container{max-width:1320px;}
+.print-head{margin:22px 0 22px!important;gap:18px!important;}
+.print-head div{padding:13px 18px!important;border-radius:14px!important;background:#f3fbf6!important;}
+.metrics{gap:26px!important;margin:22px 0 30px 0!important;}
+.box{border-radius:18px!important;box-shadow:0 4px 12px rgba(0,0,0,.055),0 14px 28px rgba(0,0,0,.035)!important;}
+.box h3{padding:13px 14px!important;}
+.metric-row{padding:16px!important;gap:14px!important;}
+.metric-row div{min-height:58px!important;background:#fbfcfb!important;}
+.plan-card{margin-top:26px!important;margin-bottom:34px!important;border-radius:18px!important;}
+.plan-card .sheet-title{padding:14px!important;font-size:17px!important;}
+.plan-card .exact-scroll{padding:26px 32px!important;background:#fff!important;}
+.plan-card .exact-grid{margin:0 auto!important;}
+.routine-card{margin-top:20px!important;}
+.view-switch{display:none!important;}
+.name-input{display:none!important;}
+.blank-name{background:#fff!important;}
+.admin-motor{display:none!important;}
+.admin-motor.admin-visible{display:block!important;}
+
+@media print{
+  @page{size:A4 portrait;margin:12mm!important;}
+  html,body{width:210mm!important;min-height:297mm!important;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .topbar,.tabs,.filter-card,.admin-motor,.view-switch,.routine-card{display:none!important;}
+  .container{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;}
+  .page{display:block!important;}
+  .page:not(.active){display:none!important;}
+  .print-head{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:4mm!important;margin:0 0 5mm 0!important;break-inside:avoid;page-break-inside:avoid;}
+  .print-head div{background:#f2fbf6!important;border:1px solid #d2e8dc!important;border-radius:5mm!important;padding:3mm 4mm!important;font-size:9px!important;}
+  .metrics{display:grid!important;grid-template-columns:1fr!important;gap:4mm!important;margin:0 0 6mm 0!important;break-inside:avoid!important;page-break-inside:avoid!important;}
+  .box{box-shadow:none!important;border:1px solid #d2dcd7!important;border-radius:5mm!important;overflow:hidden!important;break-inside:avoid!important;page-break-inside:avoid!important;}
+  .box h3{background:#006241!important;color:#fff!important;padding:2.2mm!important;font-size:9px!important;}
+  .box .big{font-size:20px!important;line-height:1.0!important;padding:3mm 0 0!important;}
+  .box small{font-size:8px!important;display:block;padding-bottom:2mm!important;}
+  .metric-row{padding:2.5mm!important;gap:2mm!important;display:grid!important;}
+  .box:nth-child(2) .metric-row{grid-template-columns:repeat(2,1fr)!important;}
+  .box:nth-child(3) .metric-row{grid-template-columns:repeat(5,1fr)!important;}
+  #dt .box:nth-child(2) .metric-row{grid-template-columns:repeat(3,1fr)!important;}
+  .metric-row div{min-height:13mm!important;padding:1.5mm!important;border:1px solid #ccd7d1!important;background:#fbfcfb!important;}
+  .metric-row b{font-size:7px!important;}
+  .metric-row span{font-size:12px!important;line-height:1!important;}
+  .ok,.bad{font-size:9px!important;margin:0 2.5mm 2.5mm!important;padding:1.5mm!important;border-radius:3mm!important;}
+  .exact-card.plan-card{margin:0!important;padding:0!important;border-radius:5mm!important;box-shadow:none!important;border:1px solid #d2dcd7!important;break-inside:avoid!important;page-break-inside:avoid!important;overflow:hidden!important;}
+  .plan-card .sheet-title{background:#006241!important;color:#fff!important;padding:2.2mm!important;font-size:9px!important;}
+  .plan-card .exact-scroll{padding:6mm 7mm!important;overflow:hidden!important;background:#fff!important;}
+  .plan-card .exact-grid{transform:scale(.54)!important;transform-origin:top left!important;margin:0!important;}
+  #dt .plan-card .exact-grid{transform:scale(.50)!important;}
+  .xcell{font-size:5.8px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .xcell.pbt-fixed-cell strong,.xcell.pbt-flex-cell strong{font-size:7.5px!important;}
+  .xcell.pbt-fixed-cell small,.xcell.pbt-flex-cell small{display:none!important;}
+  body.pdf-onepage .routine-card{display:none!important;}
+  body.pdf-onepage .admin-motor{display:none!important;}
+}
