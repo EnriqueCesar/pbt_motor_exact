@@ -1,5 +1,5 @@
 'use strict';
-// Phase 6: partner colors 1:1, no stale coordinate labels, no formula tooltips in layout
+// Phase 7: KPI arriba del layout, vista operativa/ejecutiva, rutinas colapsables, PDF vertical
 const PBT = {
   active:'cafe',
   state:{
@@ -150,15 +150,61 @@ function renderAdminMotor(tab,out){
   return `<details class="admin-motor"><summary>⚙ Mostrar Motor de Celdas PBT24</summary>${renderExactSheet(tab,out)}</details>`;
 }
 function renderMetrics(tab,out){ const ch=out.calc.canales,mx=out.calc.mix,st=PBT.state[tab]; const channels=tab==='cafe'?['Lobby','Pick up & Delivery']:['Lobby','Pick up & Delivery','DT']; const channelTotal=channels.reduce((a,k)=>a+(ch[k]||0),0), mixTotal=['Espresso','Café filtrado','CBS','Food','Otro'].reduce((a,k)=>a+(mx[k]||0),0); return `<div class="metrics"><div class="box"><h3>Información de turno</h3><div class="big">${st.partners}</div><small>Partners</small></div><div class="box"><h3>Distribución de canales</h3><div class="metric-row">${channels.map(k=>`<div><b>${PBT.labels.channel[k]}</b><span>${pct(ch[k])}</span></div>`).join('')}</div><strong class="${channelTotal===100?'ok':'bad'}">Total: ${channelTotal}%</strong></div><div class="box"><h3>Mix de productos</h3><div class="metric-row">${['Espresso','Café filtrado','CBS','Food','Otro'].map(k=>`<div><b>${PBT.labels.mix[k]}</b><span>${pct(mx[k])}</span></div>`).join('')}</div><strong class="${mixTotal===100?'ok':'bad'}">Total: ${mixTotal}%</strong></div></div>`; }
-function renderRoutines(tab,out){ const play=out.F16, rows=routineRows(play); let html=`<section class="routine-card"><div class="section-title">Rutinas de Partners</div><table class="routine"><thead><tr><th>Partner</th><th>Nombre dinámico</th><th>Estación</th><th>Fijo</th><th>Rutinas</th></tr></thead><tbody>`; for(const r of rows){ const key=String(r.partner).replace('.','').trim(), fixed=isYes(r.planted), val=nameFor(tab,key), tablet=tab==='dt'&&PBT.state.dt.partnerTablet==='Sí'&&key==='B'; html+=`<tr class="${fixed?'row-fixed':'row-flex'}"><td><b>${esc(r.partner)}</b></td><td><input class="name-input" value="${esc(val)}" maxlength="8" oninput="setName('${tab}','${esc(key)}',this.value)"></td><td>${esc(tablet?r.station+' + Carril':r.station)}</td><td>${esc(r.planted)}</td><td>${esc(tablet?r.routines+' + Tablet':r.routines)}</td></tr>`; } return html+'</tbody></table></section>'; }
+function renderViewSwitch(tab){
+  const mode=PBT.state[tab].viewMode||'operativa';
+  return `<div class="view-switch" data-view="${mode}"><button class="${mode==='operativa'?'active':''}" onclick="setView('${tab}','operativa')">👁 Vista Operativa</button><button class="${mode==='ejecutiva'?'active':''}" onclick="setView('${tab}','ejecutiva')">👁 Vista Ejecutiva</button></div>`;
+}
+function renderRoutines(tab,out){
+  const play=out.F16, rows=routineRows(play), mode=PBT.state[tab].viewMode||'operativa';
+  let html=`<section class="routine-card ${mode==='ejecutiva'?'hidden-view':''}"><div class="routine-header" onclick="toggleRoutines('${tab}')"><span id="${tab}_routine_chev">▼</span> Rutinas de Partners</div><div id="${tab}_routine_body" class="routine-body"><table class="routine"><thead><tr><th>Partner</th><th>Nombre dinámico</th><th>Estación</th><th>Fijo</th><th>Rutinas</th></tr></thead><tbody>`;
+  for(const r of rows){
+    const key=String(r.partner).replace('.','').trim(), fixed=isYes(r.planted), val=nameFor(tab,key), tablet=tab==='dt'&&PBT.state.dt.partnerTablet==='Sí'&&key==='B';
+    html+=`<tr class="${fixed?'row-fixed':'row-flex'}"><td><b>${esc(r.partner)}</b></td><td><input class="name-input" value="${esc(val)}" maxlength="8" oninput="setName('${tab}','${esc(key)}',this.value)"></td><td>${esc(tablet?r.station+' + Carril':r.station)}</td><td>${esc(r.planted)}</td><td>${esc(tablet?r.routines+' + Tablet':r.routines)}</td></tr>`;
+  }
+  return html+'</tbody></table></div></section>';
+}
+function setView(tab,mode){
+  PBT.state[tab].viewMode=mode;
+  const page=document.getElementById(tab);
+  if(page) page.classList.toggle('view-executive', mode==='ejecutiva');
+  page?.querySelectorAll('.view-switch button').forEach(b=>b.classList.remove('active'));
+  page?.querySelector(`.view-switch button[onclick="setView('${tab}','${mode}')"]`)?.classList.add('active');
+  page?.querySelectorAll('.routine-card').forEach(el=>{ el.style.display=mode==='ejecutiva'?'none':''; });
+}
+window.setView=setView;
+function toggleRoutines(tab){
+  const body=document.getElementById(`${tab}_routine_body`), chev=document.getElementById(`${tab}_routine_chev`);
+  if(!body) return;
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  if(chev) chev.textContent=hidden?'▼':'▶';
+}
+window.toggleRoutines=toggleRoutines;
 function setName(tab,key,value){ PBT.state[tab].names[key]=cleanName(value); localStorage.setItem(`pbt_exact_names_${tab}`,JSON.stringify(PBT.state[tab].names)); renderTab(tab,false); }
 window.setName=setName;
 function restoreNames(){ ['cafe','dt'].forEach(tab=>{ try{PBT.state[tab].names=JSON.parse(localStorage.getItem(`pbt_exact_names_${tab}`)||'{}');}catch(e){PBT.state[tab].names={};} }); }
 function bindFilters(tab){ ['Mes','Weekpart','DayPart','Tienda'].forEach(k=>{const el=document.getElementById(`${tab}_${k}`); if(el) el.onchange=()=>renderTab(tab);}); const p=document.getElementById(`${tab}_partners`); if(p) p.onchange=()=>renderTab(tab); const t=document.getElementById('dt_tablet'); if(t) t.onchange=()=>renderTab(tab); }
-function renderTab(tab,read=true){ if(read) readFilters(tab); const out=compute(tab), st=PBT.state[tab], root=document.getElementById(tab); const visibleStore=st.filters.Tienda[0]||'Todas las tiendas'; root.innerHTML=buildFilters(tab)+`<div class="print-head"><div><b>Tienda:</b> ${esc(visibleStore)}</div><div><b>WeekPart / DayPart:</b> ${esc(st.filters.Weekpart.join(', ')||'Todos')} / ${esc(st.filters.DayPart.join(', ')||'Todos')}</div><div><b>Partners:</b> ${st.partners}</div></div>`+renderPlanSheet(tab,out)+renderMetrics(tab,out)+renderRoutines(tab,out)+renderAdminMotor(tab,out); document.getElementById(`${tab}_status`).textContent=`Registros: ${out.calc.registros.toLocaleString('es-MX')} | Tiendas visibles: ${out.calc.tiendasVisibles} | D5: ${out.D5} | F16: ${out.F16}`; bindFilters(tab); }
+function renderTab(tab,read=true){
+  if(read) readFilters(tab);
+  const out=compute(tab), st=PBT.state[tab], root=document.getElementById(tab);
+  const visibleStore=st.filters.Tienda[0]||'Todas las tiendas';
+  root.innerHTML=buildFilters(tab)+`<div class="print-head"><div><b>Tienda:</b> ${esc(visibleStore)}</div><div><b>WeekPart / DayPart:</b> ${esc(st.filters.Weekpart.join(', ')||'Todos')} / ${esc(st.filters.DayPart.join(', ')||'Todos')}</div><div><b>Partners:</b> ${st.partners}</div></div>`+renderMetrics(tab,out)+renderPlanSheet(tab,out)+renderViewSwitch(tab)+renderRoutines(tab,out)+renderAdminMotor(tab,out);
+  document.getElementById(`${tab}_status`).textContent=`Registros: ${out.calc.registros.toLocaleString('es-MX')} | Tiendas visibles: ${out.calc.tiendasVisibles} | D5: ${out.D5} | F16: ${out.F16}`;
+  bindFilters(tab);
+  setView(tab,st.viewMode||'operativa');
+}
 function showTab(tab){ PBT.active=tab; $$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); $$('.page').forEach(p=>p.classList.toggle('active',p.id===tab)); renderTab(tab,false); }
 window.showTab=showTab;
-function exportPDF(tab){ readFilters(tab); const st=PBT.state[tab]; const tienda=(st.filters.Tienda[0]||'Todas').replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_-]+/g,'_'); const wp=(st.filters.Weekpart[0]||'Todos').replace(/\W+/g,'_'); const dp=(st.filters.DayPart[0]||'Todos').replace(/\W+/g,'_'); document.title=`PBT_${tienda}_${wp}_${dp}_${st.partners}Partners`; window.print(); }
+function exportPDF(tab){
+  readFilters(tab);
+  const st=PBT.state[tab];
+  const tienda=(st.filters.Tienda[0]||'Todas').replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_-]+/g,'_');
+  const wp=(st.filters.Weekpart[0]||'Todos').replace(/\W+/g,'_');
+  const dp=(st.filters.DayPart[0]||'Todos').replace(/\W+/g,'_');
+  document.title=`PBT_${tienda}_${wp}_${dp}_${st.partners}Partners`;
+  document.body.classList.add('printing-pdf');
+  setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove('printing-pdf'),500); },50);
+}
 window.exportPDF=exportPDF;
 function boot(){ const ok=window.PBT_ENGINE && (typeof EXCEL_DATA!=='undefined') && window.PBT_LAYOUT_SPECS; if(!ok){ const missing=[]; if(!window.PBT_ENGINE) missing.push('PBT_ENGINE/data_loader'); if(typeof EXCEL_DATA==='undefined') missing.push('EXCEL_DATA/excel_data'); if(!window.PBT_LAYOUT_SPECS) missing.push('PBT_LAYOUT_SPECS/layout_specs'); document.body.innerHTML='<main class="fatal"><h1>PBT Motor Exacto</h1><p>No cargaron los archivos de datos: '+missing.join(', ')+'. Valida js/data_part_01..04.js, js/data_loader.js, js/excel_data.js y js/layout_specs.js.</p></main>'; return; } injectLayoutStyles(); restoreNames(); document.getElementById('cafe').innerHTML=buildFilters('cafe'); document.getElementById('dt').innerHTML=buildFilters('dt'); renderTab('cafe',false); renderTab('dt',false); showTab('cafe'); }
 document.addEventListener('DOMContentLoaded',boot);
