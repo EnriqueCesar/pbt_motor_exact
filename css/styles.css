@@ -22,3 +22,86 @@
 .plan-grid .xcell.pbt-fixed-cell{background:#00704A!important;color:#FFFFFF!important;}
 .plan-grid .xcell.pbt-flex-cell{background:#FFFFFF!important;color:#00704A!important;}
 .plan-grid .xcell{cursor:default;}
+
+
+/* Phase 7: KPI arriba del layout + PDF vertical + vista operativa/ejecutiva */
+.metrics{
+  display:grid!important;
+  grid-template-columns:1fr 1.4fr 1.6fr!important;
+  gap:24px!important;
+  margin:24px 0 32px 0!important;
+}
+.box{
+  background:#fff;
+  border:1px solid #d7e4dc;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);
+}
+.box h3{padding:11px 12px!important;font-size:15px!important;letter-spacing:.1px;}
+.box .big{font-size:40px!important;padding:18px 0 2px!important;}
+.metric-row{gap:10px!important;padding:14px!important;}
+.metric-row div{border-radius:0;background:#f8faf9!important;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ok,.bad{margin:0 14px 14px!important;border-radius:10px!important;}
+.exact-card.plan-card{
+  margin-top:24px!important;
+  margin-bottom:32px!important;
+  padding:0 16px 16px 16px!important;
+  border-radius:16px!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);
+}
+.plan-card .sheet-title{border-radius:0;font-size:17px!important;padding:12px!important;}
+.plan-card .exact-scroll{padding:20px!important;background:#fff!important;}
+.plan-card .exact-grid{margin:0 auto!important;}
+.layout{height:640px!important;margin-top:12px!important;margin-bottom:32px!important;padding:20px!important;}
+.layout.dt{height:720px!important;}
+.view-switch{display:flex;gap:12px;margin:10px 0 18px 0;align-items:center;justify-content:flex-end;}
+.view-switch button{background:#006241;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:900;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.12);}
+.view-switch button.active{background:#004b35;outline:3px solid #d8f0e4;}
+.routine-card{border-radius:16px!important;overflow:hidden!important;box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);}
+.routine-card .section-title{display:none;}
+.routine-header{background:#006241;color:#fff;font-weight:900;text-align:center;padding:12px 14px;cursor:pointer;font-size:16px;}
+.routine-body{background:#fff;}
+.view-executive .routine-card{display:none!important;}
+.print-head{margin:14px 0 18px 0!important;gap:16px!important;}
+.print-head div{border-radius:12px!important;padding:11px 14px!important;}
+/* preserve Excel-like station colors under partner overlays */
+.xcell.pbt-fixed-cell{background:#00704A!important;color:#fff!important;border:2px solid #00704A!important;}
+.xcell.pbt-flex-cell{background:#fff!important;color:#00704A!important;border:2px dotted #00704A!important;}
+@media(max-width:900px){
+  .metrics{grid-template-columns:1fr!important;gap:16px!important;margin:18px 0 22px!important;}
+  .view-switch{justify-content:stretch;}
+  .view-switch button{flex:1;}
+  .plan-card .exact-scroll{padding:10px!important;}
+}
+@media print{
+  @page{size:A4 portrait;margin:8mm!important;}
+  html,body{width:210mm;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .topbar,.tabs,.filter-card,.admin-motor,.view-switch{display:none!important;}
+  .container{max-width:none!important;width:100%!important;padding:0!important;margin:0!important;}
+  .page{display:block!important;}
+  .page:not(.active){display:none!important;}
+  .print-head{display:grid!important;grid-template-columns:1fr!important;gap:4mm!important;margin:0 0 4mm 0!important;}
+  .metrics{display:grid!important;grid-template-columns:1fr!important;gap:4mm!important;margin:0 0 5mm 0!important;break-inside:avoid;page-break-inside:avoid;}
+  .metric-row{grid-template-columns:repeat(3,1fr)!important;padding:8px!important;}
+  .box:nth-child(3) .metric-row{grid-template-columns:repeat(5,1fr)!important;}
+  .box{box-shadow:none!important;border:1px solid #cfd9d4!important;border-radius:10px!important;break-inside:avoid;page-break-inside:avoid;}
+  .box h3{background:#006241!important;color:#fff!important;padding:7px!important;font-size:11px!important;}
+  .box .big{font-size:24px!important;padding:8px 0 0!important;}
+  .metric-row div{min-height:38px!important;padding:5px!important;}
+  .metric-row span{font-size:14px!important;}
+  .ok,.bad{padding:5px!important;margin:0 8px 8px!important;}
+  .plan-card{height:auto!important;max-height:118mm!important;overflow:hidden!important;margin:0 0 5mm 0!important;padding:0 2mm 2mm!important;box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;}
+  .plan-card .sheet-title{background:#006241!important;color:#fff!important;padding:6px!important;font-size:11px!important;}
+  .plan-card .exact-scroll{overflow:hidden!important;padding:3mm!important;}
+  .plan-card .exact-grid{transform:scale(.64)!important;transform-origin:top left!important;margin:0!important;}
+  .xcell{font-size:6.5px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .xcell.pbt-fixed-cell strong,.xcell.pbt-flex-cell strong{font-size:8px!important;}
+  .routine-card{box-shadow:none!important;border-radius:10px!important;break-inside:avoid;page-break-inside:avoid;}
+  .routine-header{background:#006241!important;color:#fff!important;padding:7px!important;font-size:11px!important;}
+  .routine th{background:#004b35!important;color:#fff!important;padding:5px!important;font-size:8px!important;}
+  .routine td{padding:4px!important;font-size:8px!important;}
+  .name-input{height:16px!important;padding:2px!important;font-size:8px!important;}
+  body.printing-pdf .routine-card{display:block!important;}
+  body.printing-pdf .routine-body{display:block!important;}
+}
