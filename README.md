@@ -35,3 +35,10 @@ No subir `data.js`.
 - Rutinas colapsables.
 - PDF vertical A4 con colores preservados.
 - Layout centrado con mayor margen visual.
+
+
+## Fase 8
+- PDF vertical en una sola página con mayor margen.
+- Sin botón Vista Ejecutiva.
+- Motor de celdas oculto, disponible con Ctrl+Alt+M.
+- Nombre dinámico oculto en rutinas y layout.
