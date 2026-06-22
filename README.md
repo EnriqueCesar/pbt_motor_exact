@@ -42,3 +42,11 @@ No subir `data.js`.
 - Sin botón Vista Ejecutiva.
 - Motor de celdas oculto, disponible con Ctrl+Alt+M.
 - Nombre dinámico oculto en rutinas y layout.
+
+
+## V9 Exportación PBT
+- Exportación en A4 horizontal para aprovechar mejor el espacio.
+- Encabezado/filtros compactos: aproximadamente 25% de la hoja.
+- Layout centrado y con colores preservados.
+- Rutinas visibles en la misma hoja, compactas para hasta 12+ partners.
+- Caché PWA actualizado para evitar que GitHub Pages conserve estilos anteriores.
