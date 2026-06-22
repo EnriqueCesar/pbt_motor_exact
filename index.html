@@ -6,8 +6,11 @@
   <title>PBT Motor Exacto</title>
   <meta name="theme-color" content="#006241">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/styles.css?v=9">
+  <link rel="stylesheet" href="css/styles.css?v=10">
 </head>
 <body>
   <header class="topbar"><h1>☕ PBT Motor Exacto</h1><small>CAFE / DRIVE THRU · Motor de celdas · Fijo/Flexible por rutinas</small></header>
@@ -22,7 +25,15 @@
   <script src="js/data_part_04.js?v=2"></script>
   <script src="js/data_loader.js?v=2"></script>
   <script src="js/excel_data.js?v=2"></script>
-  <script src="js/layout_specs.js?v=9"></script>
-  <script src="js/app.js?v=9"></script>
+  <script src="js/layout_specs.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
