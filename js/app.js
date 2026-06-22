@@ -199,15 +199,65 @@ function toggleAdminMotor(){
 }
 window.toggleAdminMotor=toggleAdminMotor;
 document.addEventListener('keydown',e=>{ if(e.ctrlKey&&e.altKey&&String(e.key).toLowerCase()==='m'){ e.preventDefault(); toggleAdminMotor(); }});
-function exportPDF(tab){
+function safeFileName(v){ return String(v||'Todos').replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_-]+/g,'_').replace(/^_+|_+$/g,'') || 'Todos'; }
+function waitFrame(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+async function exportPDF(tab){
   readFilters(tab);
+  renderTab(tab,false);
   const st=PBT.state[tab];
-  const tienda=(st.filters.Tienda[0]||'Todas').replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_-]+/g,'_');
-  const wp=(st.filters.Weekpart[0]||'Todos').replace(/\W+/g,'_');
-  const dp=(st.filters.DayPart[0]||'Todos').replace(/\W+/g,'_');
-  document.title=`PBT_${tienda}_${wp}_${dp}_${st.partners}Partners`;
-  document.body.classList.add('printing-pdf','pdf-onepage');
-  setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove('printing-pdf','pdf-onepage'),800); },80);
+  const tienda=safeFileName(st.filters.Tienda[0]||'Todas');
+  const wp=safeFileName(st.filters.Weekpart[0]||'Todos');
+  const dp=safeFileName(st.filters.DayPart[0]||'Todos');
+  const nombreArchivo=`PBT_${tienda}_${wp}_${dp}_${st.partners}Partners.pdf`;
+  document.title=nombreArchivo.replace(/\.pdf$/,'');
+
+  const canMakePdf = window.html2canvas && window.jspdf && window.jspdf.jsPDF;
+  const isMobile = window.innerWidth < 900 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+
+  if(!canMakePdf){
+    document.body.classList.add('printing-pdf','pdf-onepage','pdf-export');
+    setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove('printing-pdf','pdf-onepage','pdf-export'),900); },100);
+    return;
+  }
+
+  const btn=document.querySelector(`#${tab}_status`);
+  if(btn) btn.textContent='Generando PDF horizontal en 1 página...';
+
+  const previousScrollX=window.scrollX, previousScrollY=window.scrollY;
+  document.body.classList.add('pdf-export','printing-pdf','pdf-onepage');
+  window.scrollTo(0,0);
+  await waitFrame();
+
+  try{
+    const node=document.querySelector('.container');
+    const canvas=await html2canvas(node,{
+      scale:isMobile?3:2,
+      useCORS:true,
+      allowTaint:true,
+      backgroundColor:'#ffffff',
+      scrollX:0,
+      scrollY:0,
+      windowWidth:1056,
+      windowHeight:816,
+      width:1056,
+      height:816
+    });
+    const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'letter',compress:true});
+    const pageW=279.4, pageH=215.9;
+    const margin=4;
+    const imgW=pageW-(margin*2);
+    const imgH=pageH-(margin*2);
+    const img=canvas.toDataURL('image/jpeg',0.98);
+    pdf.addImage(img,'JPEG',margin,margin,imgW,imgH,undefined,'FAST');
+    pdf.save(nombreArchivo);
+  }catch(err){
+    console.error(err);
+    window.print();
+  }finally{
+    document.body.classList.remove('pdf-export','printing-pdf','pdf-onepage');
+    window.scrollTo(previousScrollX,previousScrollY);
+    renderTab(tab,false);
+  }
 }
 window.exportPDF=exportPDF;
 function boot(){ const ok=window.PBT_ENGINE && (typeof EXCEL_DATA!=='undefined') && window.PBT_LAYOUT_SPECS; if(!ok){ const missing=[]; if(!window.PBT_ENGINE) missing.push('PBT_ENGINE/data_loader'); if(typeof EXCEL_DATA==='undefined') missing.push('EXCEL_DATA/excel_data'); if(!window.PBT_LAYOUT_SPECS) missing.push('PBT_LAYOUT_SPECS/layout_specs'); document.body.innerHTML='<main class="fatal"><h1>PBT Motor Exacto</h1><p>No cargaron los archivos de datos: '+missing.join(', ')+'. Valida js/data_part_01..04.js, js/data_loader.js, js/excel_data.js y js/layout_specs.js.</p></main>'; return; } injectLayoutStyles(); restoreNames(); document.getElementById('cafe').innerHTML=buildFilters('cafe'); document.getElementById('dt').innerHTML=buildFilters('dt'); renderTab('cafe',false); renderTab('dt',false); showTab('cafe'); }
