@@ -293,3 +293,66 @@ body{background:#f5f7f5;}
   .row-fixed td:first-child{background:#ddf3e6!important;color:#006241!important;}
   .row-flex td:first-child{background:#fff!important;color:#006241!important;}
 }
+
+
+/* V10 - Corrección PDF móvil: misma salida que computadora, carta horizontal, una sola hoja */
+@media print{
+  @page{size:letter landscape;margin:5mm!important;}
+  html,body{
+    width:279mm!important;
+    height:216mm!important;
+    min-height:216mm!important;
+    max-height:216mm!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:#fff!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  body.pdf-export{width:279mm!important;height:216mm!important;overflow:hidden!important;}
+  .topbar,.tabs,.filter-card,.sheet,.admin-motor,.view-switch,.actions{display:none!important;}
+  .container{
+    width:269mm!important;
+    max-width:269mm!important;
+    height:206mm!important;
+    max-height:206mm!important;
+    margin:0 auto!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+  .page{display:block!important;width:269mm!important;max-width:269mm!important;overflow:hidden!important;}
+  .page:not(.active){display:none!important;}
+  .page.active{
+    width:269mm!important;
+    max-width:269mm!important;
+    height:206mm!important;
+    max-height:206mm!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:2mm!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .print-head,.metrics,.exact-card,.plan-card,.routine-card,.layout-grid,.rutinas-table{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .print-head{height:8mm!important;flex:0 0 8mm!important;margin:0!important;}
+  .metrics{height:38mm!important;flex:0 0 38mm!important;margin:0!important;}
+  .exact-card.plan-card{height:103mm!important;max-height:103mm!important;flex:0 0 103mm!important;margin:0!important;}
+  .plan-card .exact-scroll{height:94mm!important;max-height:94mm!important;overflow:hidden!important;}
+  .routine-card{display:block!important;flex:1 1 auto!important;margin:0!important;min-height:0!important;max-height:53mm!important;overflow:hidden!important;}
+  .routine-body{display:block!important;overflow:hidden!important;}
+}
+
+@media print and (max-width:900px){
+  /* En Android/Samsung evita que las reglas responsivas angostas cambien el layout antes del PDF. */
+  .container,.page,.page.active{width:269mm!important;max-width:269mm!important;}
+  .print-head{grid-template-columns:1.35fr 1.35fr .55fr!important;}
+  .metrics{grid-template-columns:.65fr 1fr 1.35fr!important;}
+  .plan-card .exact-grid{transform:scale(.61)!important;transform-origin:top center!important;}
+  #dt .plan-card .exact-grid{transform:scale(.55)!important;}
+}
