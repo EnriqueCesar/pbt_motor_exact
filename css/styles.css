@@ -356,3 +356,138 @@ body{background:#f5f7f5;}
   .plan-card .exact-grid{transform:scale(.61)!important;transform-origin:top center!important;}
   #dt .plan-card .exact-grid{transform:scale(.55)!important;}
 }
+
+/* V12 - Captura PDF real desde móvil: fuerza lienzo de escritorio en carta horizontal */
+body.pdf-export{
+  background:#fff!important;
+  overflow:hidden!important;
+  width:1056px!important;
+  min-width:1056px!important;
+}
+body.pdf-export .topbar,
+body.pdf-export .tabs,
+body.pdf-export .filter-card,
+body.pdf-export .sheet,
+body.pdf-export .admin-motor,
+body.pdf-export .view-switch,
+body.pdf-export .actions{
+  display:none!important;
+}
+body.pdf-export .container{
+  width:1056px!important;
+  max-width:1056px!important;
+  height:816px!important;
+  max-height:816px!important;
+  margin:0 auto!important;
+  padding:8px 10px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+body.pdf-export .page{display:none!important;}
+body.pdf-export .page.active{
+  display:flex!important;
+  flex-direction:column!important;
+  width:1036px!important;
+  max-width:1036px!important;
+  height:800px!important;
+  max-height:800px!important;
+  overflow:hidden!important;
+  gap:8px!important;
+}
+body.pdf-export .print-head{
+  display:grid!important;
+  grid-template-columns:1.4fr 1.4fr .7fr!important;
+  gap:10px!important;
+  height:30px!important;
+  flex:0 0 30px!important;
+  margin:0!important;
+}
+body.pdf-export .print-head div{
+  font-size:7px!important;
+  padding:6px 8px!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+body.pdf-export .metrics{
+  display:grid!important;
+  grid-template-columns:.8fr 1.35fr 1.65fr!important;
+  gap:12px!important;
+  height:120px!important;
+  flex:0 0 120px!important;
+  margin:0!important;
+}
+body.pdf-export .box{
+  margin:0!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+body.pdf-export .box h3{font-size:8px!important;padding:7px!important;line-height:1!important;}
+body.pdf-export .box .big{font-size:22px!important;padding-top:12px!important;}
+body.pdf-export .box small{font-size:8px!important;margin-bottom:5px!important;}
+body.pdf-export .metric-row{gap:6px!important;padding:10px!important;}
+body.pdf-export .metric-row div{padding:8px 4px!important;}
+body.pdf-export .metric-row b{font-size:6px!important;}
+body.pdf-export .metric-row span{font-size:13px!important;}
+body.pdf-export .ok,
+body.pdf-export .bad{font-size:7px!important;margin:0 10px 10px!important;padding:6px!important;}
+body.pdf-export .exact-card.plan-card{
+  height:382px!important;
+  max-height:382px!important;
+  flex:0 0 382px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  border:1px solid #ccd8d2!important;
+}
+body.pdf-export .plan-card .sheet-title{
+  font-size:8px!important;
+  padding:7px!important;
+  line-height:1!important;
+}
+body.pdf-export .plan-card .exact-scroll{
+  height:350px!important;
+  max-height:350px!important;
+  overflow:hidden!important;
+  padding:12px 16px!important;
+  background:#fff!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+body.pdf-export .plan-card .exact-grid{
+  transform:scale(.64)!important;
+  transform-origin:top center!important;
+  margin:0 auto!important;
+}
+body.pdf-export #dt .plan-card .exact-grid{transform:scale(.57)!important;}
+body.pdf-export .xcell{font-size:6.5px!important;line-height:1!important;}
+body.pdf-export .xcell.pbt-fixed-cell strong,
+body.pdf-export .xcell.pbt-flex-cell strong{font-size:9px!important;}
+body.pdf-export .xcell.pbt-fixed-cell small,
+body.pdf-export .xcell.pbt-flex-cell small{display:none!important;}
+body.pdf-export .routine-card{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:250px!important;
+  margin:0!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  border:1px solid #ccd8d2!important;
+}
+body.pdf-export .routine-body{display:block!important;overflow:hidden!important;}
+body.pdf-export .routine-header,
+body.pdf-export .section-title{background:#006241!important;color:#fff!important;padding:7px!important;font-size:8px!important;line-height:1!important;}
+body.pdf-export .routine{width:100%!important;border-collapse:collapse!important;table-layout:fixed!important;font-size:6px!important;}
+body.pdf-export .routine th{padding:5px!important;font-size:6px!important;line-height:1!important;}
+body.pdf-export .routine td{padding:4px 5px!important;font-size:6px!important;line-height:1.05!important;white-space:normal!important;overflow:hidden!important;}
+body.pdf-export .routine th:nth-child(1),body.pdf-export .routine td:nth-child(1){width:8%!important;}
+body.pdf-export .routine th:nth-child(2),body.pdf-export .routine td:nth-child(2){width:14%!important;}
+body.pdf-export .routine th:nth-child(3),body.pdf-export .routine td:nth-child(3){width:18%!important;}
+body.pdf-export .routine th:nth-child(4),body.pdf-export .routine td:nth-child(4){width:8%!important;}
+body.pdf-export .routine th:nth-child(5),body.pdf-export .routine td:nth-child(5){width:52%!important;}
